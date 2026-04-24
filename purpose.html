@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Why MannSetu? 🌿</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: linear-gradient(to right, #dbeafe, #ede9fe);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 25px;
+      border-radius: 20px;
+      text-align: center;
+      width: 320px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .option {
+      background: #e0e7ff;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .option:hover {
+      background: #c7d2fe;
+    }
+
+    .info {
+      margin-top: 15px;
+      padding: 10px;
+      background: #f1f5f9;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      background: #6366f1;
+      color: white;
+      cursor: pointer;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h3>Why do you need MannSetu? 💭</h3>
+
+  <div class="option" onclick="showInfo('stress')">😫 Stress</div>
+  <div class="option" onclick="showInfo('time')">📚 Time Management</div>
+  <div class="option" onclick="showInfo('overthinking')">💭 Overthinking</div>
+  <div class="option" onclick="showInfo('motivation')">🔥 Motivation</div>
+
+  <div id="infoBox" class="info"></div>
+
+  <button onclick="continueApp()">Continue →</button>
+
+</div>
+
+<script>
+
+let selectedPurpose = "";
+
+function showInfo(type) {
+  selectedPurpose = type;
+
+  let text = "";
+
+  if (type === "stress") {
+    text = "You're feeling stressed 😫\n\nMannSetu can help you by:\n• Tracking your mood 😊\n• Playing stress-free games 🎮\n• Taking small mental breaks 🌿";
+  }
+
+  else if (type === "time") {
+    text = "You want better time management 📚\n\nMannSetu can help you by:\n• Adding tasks 📝\n• Setting priorities 🔴🟡🟢\n• Using calendar 📅 to plan your day";
+  }
+
+  else if (type === "overthinking") {
+    text = "You're dealing with overthinking 💭\n\nMannSetu can help you by:\n• Writing your thoughts in journal 📓\n• Clearing your mind step by step\n• Reflecting calmly 🌿";
+  }
+
+  else if (type === "motivation") {
+    text = "You need motivation 🔥\n\nMannSetu can help you by:\n• Setting small goals 🎯\n• Tracking progress\n• Staying consistent with tasks 💪";
+  }
+
+  document.getElementById("infoBox").innerText = text;
+}
+
+function continueApp() {
+  if (!selectedPurpose) {
+    alert("Please select an option 💙");
+    return;
+  }
+
+  localStorage.setItem("purpose", selectedPurpose);
+
+  window.location.href = "dashboard.html";
+}
+
+</script>
+
+</body>
+</html>h

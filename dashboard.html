@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MannSetu Dashboard 🌿</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: linear-gradient(to right, #dbeafe, #ede9fe);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      width: 340px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    img {
+      width: 70px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      margin-bottom: 5px;
+    }
+
+    p {
+      color: gray;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 12px;
+      background: #6366f1;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.2s;
+    }
+
+    .btn:hover {
+      transform: scale(1.03);
+      opacity: 0.9;
+    }
+
+    .btn:nth-child(4) { background: #22c55e; }
+    .btn:nth-child(5) { background: #f59e0b; }
+    .btn:nth-child(6) { background: #ef4444; }
+    .btn:nth-child(7) { background: #3b82f6; }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- LOGO -->
+  <img src="logo.png">
+
+  <!-- 👤 USER NAME -->
+  <h2 id="welcomeText">Welcome 🌿</h2>
+
+  <p>Choose what you want to do today 💙</p>
+
+  <button class="btn" onclick="go('mood')">😊 Mood Tracker</button>
+  <button class="btn" onclick="go('journal')">📓 Journal</button>
+  <button class="btn" onclick="go('task')">📅 Tasks & Calendar</button>
+  <button class="btn" onclick="go('game')">🎮 Stress Free Game</button>
+
+</div>
+
+<script>
+
+// 👤 SHOW USER NAME FROM DETAILS PAGE
+const name = localStorage.getItem("name");
+
+if (name) {
+  document.getElementById("welcomeText").innerText =
+    "Welcome, " + name + " 💙";
+}
+
+// NAVIGATION
+function go(section) {
+  if (section === "game") {
+    window.location.href = "game.html";
+  } else {
+    window.location.href = "index.html?section=" + section;
+  }
+}
+
+</script>
+
+</body>
+</html>

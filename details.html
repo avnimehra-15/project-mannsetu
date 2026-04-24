@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Details 🌿</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: linear-gradient(to right, #dbeafe, #ede9fe);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      width: 300px;
+      text-align: center;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      background: #6366f1;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>Your Details 👤</h2>
+
+  <input id="name" placeholder="Enter your name">
+  <input id="age" placeholder="Enter your age">
+
+  <select id="gender">
+    <option>Male</option>
+    <option>Female</option>
+    <option>Other</option>
+  </select>
+
+  <button onclick="nextPage()">Continue</button>
+</div>
+
+<script>
+function nextPage() {
+  const name = document.getElementById("name").value;
+  const age = document.getElementById("age").value;
+  const gender = document.getElementById("gender").value;
+
+  if (name === "" || age === "") {
+    alert("Please fill all details 💙");
+    return;
+  }
+
+  localStorage.setItem("name", name);
+  localStorage.setItem("age", age);
+  localStorage.setItem("gender", gender);
+
+  window.location.href = "purpose.html";
+}
+</script>
+
+</body>
+</html>
