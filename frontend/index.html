@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MannSetu 🌿</title>
+  <script>
+    const fromDashboard=window.location.search.includes("section=");
+    if (!fromDashboard){ window.location.href="login.html"; }
+  </script>
+  <style>
+    body { font-family: Arial; background: linear-gradient(to right, #dbeafe, #ede9fe); padding: 20px; }
+    .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    h1, h3 { text-align: center; }
+    img { display: block; margin: auto; width: 80px; }
+    .mood { display: flex; justify-content: center; gap: 12px; margin-bottom: 15px; }
+    .mood span { font-size: 24px; cursor: pointer; }
+    input, select, textarea { width: 100%; padding: 10px; margin-top: 10px; border-radius: 10px; border: 1px solid #ccc; }
+    button { margin-top: 10px; padding: 8px 12px; border: none; border-radius: 8px; background: #6366f1; color: white; cursor: pointer; }
+    .task { padding: 10px; margin-top: 5px; border-radius: 10px; color: white; }
+    .calendar-header { display: flex; justify-content: space-between; align-items: center; }
+    #calendarGrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 10px; }
+    .day { background: #f1f5f9; padding: 10px; border-radius: 10px; text-align: center; position: relative; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); }
+    .suggestion { margin-top: 15px; padding: 10px; background: #e0e7ff; border-radius: 10px; text-align: center; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <img src="logo.png">
+  <h1>MannSetu 🌿</h1>
+
+  <div id="reminderBox" style="display:none;background:#fee2e2;padding:10px;border-radius:10px;margin-bottom:15px;font-weight:bold;"></div>
+
+  <div id="moodSection">
+    <h3>How are you feeling?</h3>
+    <div class="mood">
+      <span onclick="saveMood('happy')">😊</span>
+      <span onclick="saveMood('sad')">😢</span>
+      <span onclick="saveMood('angry')">😡</span>
+      <span onclick="saveMood('stressed')">😫</span>
+      <span onclick="saveMood('calm')">😌</span>
+    </div>
+    <div id="suggestionBox" class="suggestion"></div>
+  </div>
+
+  <div id="taskSection">
+    <h3>📝 Add Task</h3>
+    <input id="taskInput" placeholder="Enter task">
+    <select id="priority">
+      <option value="high">High</option>
+      <option value="medium">Medium</option>
+      <option value="low">Low</option>
+    </select>
+    <input type="date" id="taskDate">
+    <button onclick="addTask()">Add Task</button>
+    <div id="taskList"></div>
+    <h3>📅 Calendar</h3>
+    <div class="calendar-header">
+      <button onclick="changeMonth(-1)">←</button>
+      <h4 id="monthYear"></h4>
+      <button onclick="changeMonth(1)">→</button>
+    </div>
+    <div id="calendarGrid"></div>
+  </div>
+
+  <div id="journalSection">
+    <h3>📓 Journal</h3>
+    <textarea id="journalText"></textarea>
+    <button onclick="saveJournal()">Save</button>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDBxz277L2lvgNAE_C7vNLgPBoJCUusIc8",
+    authDomain: "mannsetu123.firebaseapp.com",
+    projectId: "mannsetu123",
+    storageBucket: "mannsetu123.firebasestorage.app",
+    messagingSenderId: "903453903472",
+    appId: "1:903453903472:web:157385de502cee678502b5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let uid = null;
+  let currentDate = new Date();
+
+  const params = new URLSearchParams(window.location.search);
+  const section = params.get("section");
+
+  function showSection() {
+    document.getElementById("moodSection").style.display = "none";
+    document.getElementById("taskSection").style.display = "none";
+    document.getElementById("journalSection").style.display = "none";
+    if (section === "mood") document.getElementById("moodSection").style.display = "block";
+    else if (section === "journal") document.getElementById("journalSection").style.display = "block";
+    else document.getElementById("taskSection").style.display = "block";
+  }
+  showSection();
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) { window.location.href = "login.html"; return; }
+    uid = user.uid;
+    await displayTasks();
+    showCalendar();
+    checkReminders();
+  });
+
+  window.saveMood = async function (mood) {
+    let text = "";
+    if (mood === "happy") text = "You're feeling happy 😊 Keep going!";
+    else if (mood === "sad") text = "You're feeling sad 😢 Take rest 💙";
+    else if (mood === "angry") text = "You're feeling angry 😡 Breathe slowly";
+    else if (mood === "stressed") text = "You're stressed 😫 Take a break";
+    else if (mood === "calm") text = "You're calm 😌 Maintain this 🌿";
+    document.getElementById("suggestionBox").innerText = text;
+    if (uid) await addDoc(collection(db, `users/${uid}/moods`), { mood, timestamp: serverTimestamp() });
+  };
+
+  window.addTask = async function () {
+    const task = document.getElementById("taskInput").value;
+    const priority = document.getElementById("priority").value;
+    const date = document.getElementById("taskDate").value;
+    if (!task) return;
+    await addDoc(collection(db, `users/${uid}/tasks`), { task, priority, date, timestamp: serverTimestamp() });
+    document.getElementById("taskInput").value = "";
+    document.getElementById("taskDate").value = "";
+    await displayTasks();
+    showCalendar();
+  };
+
+  async function getTasks() {
+    const q = query(collection(db, `users/${uid}/tasks`), orderBy("timestamp", "desc"));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => d.data());
+  }
+
+  async function displayTasks() {
+    const taskList = document.getElementById("taskList");
+    taskList.innerHTML = "";
+    const tasks = await getTasks();
+    tasks.forEach(t => {
+      let color = t.priority === "high" ? "red" : t.priority === "medium" ? "orange" : "green";
+      const div = document.createElement("div");
+      div.className = "task";
+      div.style.background = color;
+      div.innerText = `${t.task} (${t.date})`;
+      taskList.appendChild(div);
+    });
+  }
+
+  window.showCalendar = async function () {
+    const calendar = document.getElementById("calendarGrid");
+    const monthYear = document.getElementById("monthYear");
+    calendar.innerHTML = "";
+    const month = currentDate.getMonth();
+    const year = currentDate.getFullYear();
+    const names = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    monthYear.innerText = `${names[month]} ${year}`;
+    const days = new Date(year, month + 1, 0).getDate();
+    const tasks = uid ? await getTasks() : [];
+    for (let i = 1; i <= days; i++) {
+      const dayDiv = document.createElement("div");
+      dayDiv.className = "day";
+      dayDiv.innerText = i;
+      tasks.forEach(t => {
+        const d = new Date(t.date);
+        if (d.getDate() === i && d.getMonth() === month) {
+          let color = t.priority === "high" ? "red" : t.priority === "medium" ? "orange" : "green";
+          const dot = document.createElement("div");
+          dot.className = "dot";
+          dot.style.background = color;
+          dayDiv.appendChild(dot);
+          dayDiv.title = t.task;
+        }
+      });
+      calendar.appendChild(dayDiv);
+    }
+  };
+
+  window.changeMonth = function (step) {
+    currentDate.setMonth(currentDate.getMonth() + step);
+    showCalendar();
+  };
+
+  window.saveJournal = async function () {
+    const text = document.getElementById("journalText").value.trim();
+    if (!text) return;
+    await addDoc(collection(db, `users/${uid}/journal`), { text, timestamp: serverTimestamp() });
+    document.getElementById("journalText").value = "";
+    alert("Saved 💙");
+  };
+
+  async function checkReminders() {
+    const tasks = await getTasks();
+    let today = new Date();
+    let messages = [];
+    tasks.forEach(t => {
+      let taskDate = new Date(t.date);
+      let diffTime = taskDate - today;
+      let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      if (t.priority === "high" && diffDays === 5) messages.push("🔴 " + t.task + " due in 5 days");
+      if (t.priority === "medium" && diffDays === 3) messages.push("🟡 " + t.task + " due in 3 days");
+      if (t.priority === "low" && diffDays === 1) messages.push("🟢 " + t.task + " due tomorrow");
+    });
+    if (messages.length > 0) {
+      const box = document.getElementById("reminderBox");
+      box.style.display = "block";
+      box.innerHTML = messages.join("<br>");
+    }
+  }
+</script>
+</body>
+</html>

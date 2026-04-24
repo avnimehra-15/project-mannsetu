@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Relax Zone 🌿</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: linear-gradient(to right, #dbeafe, #ede9fe);
+      text-align: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 20px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    button {
+      padding: 12px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      background: #6366f1;
+      color: white;
+      cursor: pointer;
+    }
+
+    .game-box {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      background: #f1f5f9;
+    }
+
+    #bubble {
+      width: 60px;
+      height: 60px;
+      background: #60a5fa;
+      border-radius: 50%;
+      margin: 20px auto;
+      cursor: pointer;
+      position: relative;
+    }
+
+    #timer {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h2>Relax Zone 🌿</h2>
+  <p>Take a break. Play something calming 💙</p>
+
+  <div id="timer">⏱ Time left: 30:00</div>
+
+  <button onclick="startGame(1)">🌬️ Bubble Pop (15 min)</button>
+  <button onclick="startGame(2)">💭 Positive Tap (15 min)</button>
+
+  <!-- GAME AREA -->
+  <div id="gameArea"></div>
+
+</div>
+
+<script>
+
+let totalTime = 30 * 60; // 30 minutes total
+let gameTimer;
+
+// ⏱ GLOBAL TIMER
+function startTimer() {
+  clearInterval(gameTimer);
+
+  gameTimer = setInterval(() => {
+    totalTime--;
+
+    let min = Math.floor(totalTime / 60);
+    let sec = totalTime % 60;
+
+    document.getElementById("timer").innerText =
+      `⏱ Time left: ${min}:${sec < 10 ? "0" : ""}${sec}`;
+
+    if (totalTime <= 0) {
+      clearInterval(gameTimer);
+      alert("Time's up 💙 Take rest now!");
+      location.reload();
+    }
+  }, 1000);
+}
+
+// 🎮 START GAME
+function startGame(game) {
+  startTimer();
+
+  const area = document.getElementById("gameArea");
+
+  if (game === 1) {
+    area.innerHTML = `
+      <div class="game-box">
+        <h3>🌬️ Bubble Pop</h3>
+        <p>Click the bubble to relax 😊</p>
+        <div id="bubble" onclick="moveBubble()"></div>
+      </div>
+    `;
+  }
+
+  if (game === 2) {
+    area.innerHTML = `
+      <div class="game-box">
+        <h3>💭 Positive Tap</h3>
+        <p id="msg">Click below to feel better 💙</p>
+        <button onclick="positiveMsg()">Tap Me</button>
+      </div>
+    `;
+  }
+}
+
+// 🌬️ MOVE BUBBLE
+function moveBubble() {
+  const bubble = document.getElementById("bubble");
+
+  const x = Math.random() * 200;
+  const y = Math.random() * 200;
+
+  bubble.style.left = x + "px";
+  bubble.style.top = y + "px";
+}
+
+// 💭 POSITIVE MESSAGES
+function positiveMsg() {
+  const msgs = [
+    "You're doing amazing 💙",
+    "Take a deep breath 🌿",
+    "You're stronger than you think 💪",
+    "Everything will be okay ✨",
+    "You matter 🌸"
+  ];
+
+  const random = msgs[Math.floor(Math.random() * msgs.length)];
+
+  document.getElementById("msg").innerText = random;
+}
+
+</script>
+
+</body>
+</html>

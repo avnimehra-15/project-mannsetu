@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MannSetu Login 🌿</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: linear-gradient(to right, #dbeafe, #ede9fe);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      width: 300px;
+      text-align: center;
+    }
+    h1 { margin-bottom: 10px; }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 15px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      background: #6366f1;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover { opacity: 0.8; }
+    p { font-size: 14px; color: gray; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>MannSetu 🌿</h1>
+  <p>Welcome! Let's get started 💙</p>
+  <input id="phone" placeholder="Enter Phone Number">
+  <button onclick="goNext()">Continue</button>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDBxz277L2lvgNAE_C7vNLgPBoJCUusIc8",
+    authDomain: "mannsetu123.firebaseapp.com",
+    projectId: "mannsetu123",
+    storageBucket: "mannsetu123.firebasestorage.app",
+    messagingSenderId: "903453903472",
+    appId: "1:903453903472:web:157385de502cee678502b5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) window.location.href = "details.html";
+  });
+
+  window.goNext = async function () {
+    const phone = document.getElementById("phone").value.trim();
+    if (phone === "") { alert("Please enter phone number 📱"); return; }
+
+    const fakeEmail = phone + "@mannsetu.app";
+    const password = "mann" + phone;
+
+    try {
+      await signInWithEmailAndPassword(auth, fakeEmail, password);
+    } catch (err) {
+      if (err.code === "auth/user-not-found" || err.code === "auth/invalid-credential") {
+        await createUserWithEmailAndPassword(auth, fakeEmail, password);
+      } else {
+        alert("Something went wrong. Try again.");
+        return;
+      }
+    }
+    localStorage.setItem("phone", phone);
+    window.location.href = "details.html";
+  };
+</script>
+</body>
+</html>
