@@ -53,7 +53,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDBxz277L2lvgNAE_C7vNLgPBoJCUusIc8",
@@ -66,10 +66,6 @@
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-
-  onAuthStateChanged(auth, (user) => {
-    if (user) window.location.href = "index.html?section=mood";
-  });
 
   window.goNext = async function () {
     const phone = document.getElementById("phone").value.trim();
